@@ -76,3 +76,4 @@ sitemap.xml.gz*~
 
 dist/*
 assets.json
+node_modules
