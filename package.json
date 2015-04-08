@@ -1,0 +1,93 @@
+{
+  
+  "//": "Awesome sauce:",
+  "//": "http://blog.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool/",
+  "//": "https://github.com/keithamus/npm-scripts-example",
+  
+  "name": "npm-scripts-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "browserify": "~9",
+    "hashmark": "~2",
+    "http-server": "~0",
+    "jade": "~1",
+    "jshint": "~2",
+    "karma": "~0",
+    "karma-browserify": "~4",
+    "karma-cli": "~0",
+    "karma-mocha": "~0",
+    "karma-phantomjs-launcher": "~0",
+    "live-reload": "~0",
+    "minifyify": "~6",
+    "mocha": "~2",
+    "nodemon": "~1",
+    "opener": "~1",
+    "parallelshell": "~1",
+    "rimraf": "~2",
+    "s3-cli": "~0",
+    "stylus": "~0"
+  },
+  
+  "//": "https://docs.npmjs.com/misc/config",
+  "//": "Shorthands and Other CLI Niceties",
+  "//": "The following shorthands are parsed on the command-line:",
+  
+  "//": "                -v: --version",
+  "//": "-h, -?, --help, -H: --usage",
+  "//": "      -s, --silent: --loglevel silent",
+  "//": "       -q, --quiet: --loglevel warn",
+  "//": "                -d: --loglevel info",
+  "//": "    -dd, --verbose: --loglevel verbose",
+  "//": "              -ddd: --loglevel silly",
+  "//": "                -g: --global",
+  "//": "                -C: --prefix",
+  "//": "                -l: --long",
+  "//": "                -m: --message",
+  "//": "   -p, --porcelain: --parseable",
+  "//": "              -reg: --registry",
+  "//": "                -f: --force",
+  "//": "             -desc: --description",
+  "//": "                -S: --save",
+  "//": "                -D: --save-dev",
+  "//": "                -O: --save-optional",
+  "//": "                -B: --save-bundle",
+  "//": "                -E: --save-exact",
+  "//": "                -y: --yes",
+  "//": "                -n: --yes false",
+  "//": "ll and la commands: ls --long",
+  
+  "scripts": {
+    
+    "clean": "rimraf dist/*",
+    
+    "prebuild": "npm run clean -s",
+    "build": "npm run build:scripts -s && npm run build:styles -s && npm run build:markup -s",
+    "build:scripts": "browserify -d assets/scripts/main.js -p [minifyify --compressPath . --map main.js.map --output dist/main.js.map] | hashmark -n dist/main.js -s -l 8 -m assets.json 'dist/{name}{hash}{ext}'",
+    "build:styles": "stylus assets/styles/main.styl -m -o dist/ && hashmark -s -l 8 -m assets.json dist/main.css 'dist/{name}{hash}{ext}'",
+    "build:markup": "jade assets/markup/index.jade --obj assets.json -o dist",
+    
+    "test": "karma start --singleRun",
+    
+    "watch": "parallelshell \"npm run watch:test -s\" \"npm run watch:build -s\"",
+    "watch:test": "karma start",
+    "watch:build": "nodemon -q -w assets/ --ext '.' --exec 'npm run build'",
+    
+    "open:prod": "opener http://example.com",
+    "open:stage": "opener http://staging.example.internal",
+    "open:dev": "opener http://localhost:9090",
+    
+    "deploy:prod": "s3-cli sync ./dist/ s3://example-com/prod-site/",
+    "deploy:stage": "s3-cli sync ./dist/ s3://example-com/stage-site/",
+    
+    "serve": "http-server -p 9090 dist/",
+    "live-reload": "live-reload --port 9091 dist/",
+    
+    "dev": "npm run open:dev -s & parallelshell \"npm run live-reload -s\" \"npm run serve -s\" \"npm run watch -s\""
+    
+  }
+  
+}
