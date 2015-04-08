@@ -74,6 +74,5 @@ sitemap.xml.gz*~
 # PROJECT-SPECIFIC #
 ####################
 
-dist/*
 assets.json
 node_modules
